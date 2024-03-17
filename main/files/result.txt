@@ -1,0 +1,4 @@
+Size: 100 TIme: 0.018
+Size: 250 TIme: 0.321
+Size: 500 TIme: 2.25
+Size: 750 TIme: 7.336
