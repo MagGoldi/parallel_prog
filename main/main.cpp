@@ -1,10 +1,13 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <string>
+using namespace std;
 
-void writeMatrixToFile(const std::string &filename, const std::vector<std::vector<int>> &matrix)
+void writeMatrixToFile(string filename, const vector<vector<int>> &matrix)
 {
-    std::ofstream file(filename);
+
+    std::ofstream file("files/" + filename);
 
     if (file.is_open())
     {
@@ -26,12 +29,35 @@ void writeMatrixToFile(const std::string &filename, const std::vector<std::vecto
     }
 }
 
+void createRandMatrix(string file_name, int size)
+{
+    vector<vector<int>> matrix(size, vector<int>(size));
+
+    for (int i = 0; i < matrix.size(); i++)
+    {
+        for (int j = 0; j < matrix.size(); j++)
+        {
+            matrix[i][j] = rand() % 500;
+        }
+    }
+    writeMatrixToFile(file_name, matrix);
+}
+
 int main()
 {
-    std::vector<std::vector<int>> matrix = {{1, 4, 3}, {4, 5, 6}, {7, 8, 9}};
-    std::string filename = "matrix.txt";
+    std::initializer_list<int> SIZE = {100, 250, 500, 750, 1000, 1500, 2000};
+    int index = 1;
 
-    writeMatrixToFile(filename, matrix);
+    for (const auto &size : SIZE)
+    {
+        std::vector<std::vector<int>> matrix_1(size, std::vector<int>(size));
+        std::vector<std::vector<int>> matrix_2(size, std::vector<int>(size));
+        std::vector<std::vector<int>> matrix_res(size, std::vector<int>(size));
 
+        createRandMatrix("matrix1_" + std::to_string(size) + ".txt", size);
+        createRandMatrix("matrix2_" + std::to_string(size) + ".txt", size);
+
+        index++;
+    }
     return 0;
 }
