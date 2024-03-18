@@ -98,7 +98,7 @@ void writeStat(string str, vector<vector<int>> &matrix_result, int size, clock_t
 int main()
 {
     std::ofstream file("files/result.txt", std::ios::out | std::ios::trunc);
-    std::initializer_list<int> SIZE = {100, 250, 500, 750, 1000, 1500, 2000};
+    std::initializer_list<int> SIZE = {100, 250, 500, 750, 1000, 1500, 2000, 3000};
     int index = 1;
 
     for (const auto &size : SIZE)
