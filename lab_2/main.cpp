@@ -64,7 +64,6 @@ void read_matrix(vector<vector<int>> &matrix, int size, string filename)
 
 void mulMatrix(const vector<vector<int>> &matrix_1, const vector<vector<int>> &matrix_2, vector<vector<int>> &matrix_result)
 {
-    omp_set_num_threads(8);
     int i, j, k;
 #pragma omp parallel for shared(matrix_1, matrix_2, matrix_result) private(i, j, k)
     for (i = 0; i < matrix_result.size(); i++)
@@ -80,7 +79,7 @@ void mulMatrix(const vector<vector<int>> &matrix_1, const vector<vector<int>> &m
     }
 }
 
-void writeStat(string str, vector<vector<int>> &matrix_result, int size, clock_t end, clock_t start)
+void writeStat(string str, vector<vector<int>> &matrix_result, int size, clock_t end, clock_t start, int i)
 {
     ofstream data(str);
     ofstream result("files/result.txt", ios::app);
@@ -93,7 +92,8 @@ void writeStat(string str, vector<vector<int>> &matrix_result, int size, clock_t
         }
         data << endl;
     }
-    result << "Size: " << size << " TIme: " << (double(end - start)) / (double(CLOCKS_PER_SEC)) << endl;
+    cout << "Matrix has been created:" << str << endl;
+    result << "Size: " << size << " №: " << i << " Time: " << (double(end - start)) / (double(CLOCKS_PER_SEC)) << endl;
 
     data.close();
     result.close();
@@ -103,28 +103,31 @@ int main()
 {
     std::ofstream file("files/result.txt", std::ios::out | std::ios::trunc);
     std::initializer_list<int> SIZE = {100, 250, 500, 750, 1000, 1500, 2000, 3000};
-    int index = 1;
 
-    for (const auto &size : SIZE)
-    {
-        std::vector<std::vector<int>> matrix_1(size, std::vector<int>(size));
-        std::vector<std::vector<int>> matrix_2(size, std::vector<int>(size));
-        std::vector<std::vector<int>> matrix_res(size, std::vector<int>(size));
+    for (int size : SIZE)
+        for (int i = 1; i < 4; i++)
+        {
+            {
+                std::vector<std::vector<int>> matrix_1(size, std::vector<int>(size));
+                std::vector<std::vector<int>> matrix_2(size, std::vector<int>(size));
+                std::vector<std::vector<int>> matrix_res(size, std::vector<int>(size));
 
-        createRandMatrix("matrix1_" + std::to_string(size) + ".txt", size);
-        createRandMatrix("matrix2_" + std::to_string(size) + ".txt", size);
+                createRandMatrix("matrix1_" + std::to_string(size) + "_" + std::to_string(i) + ".txt", size);
+                createRandMatrix("matrix2_" + std::to_string(size) + "_" + std::to_string(i) + ".txt", size);
 
-        read_matrix(matrix_1, size, "matrix1_" + std::to_string(size) + ".txt");
-        read_matrix(matrix_2, size, "matrix2_" + std::to_string(size) + ".txt");
+                read_matrix(matrix_1, size, "matrix1_" + std::to_string(size) + ".txt");
+                read_matrix(matrix_2, size, "matrix2_" + std::to_string(size) + ".txt");
 
-        clock_t start, end;
-        start = clock();
-        mulMatrix(matrix_1, matrix_2, matrix_res);
-        end = clock();
+                clock_t start, end;
+                if (!matrix_1.empty() && !matrix_2.empty())
+                {
+                    start = clock();
+                    mulMatrix(matrix_1, matrix_2, matrix_res);
+                    end = clock();
+                }
 
-        writeStat("files/matrix_res/matrix_res_" + std::to_string(size) + ".txt", matrix_res, size, end, start);
-
-        index++;
-    }
+                writeStat("files/matrix_res/matrix_res_" + std::to_string(size) + "_" + std::to_string(i) + ".txt", matrix_res, size, end, start, i);
+            }
+        }
     return 0;
 }
