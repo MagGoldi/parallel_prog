@@ -1,4 +1,4 @@
-Size: 100 №: 1 Time: 0.019
+Size: 100 №: 1 Time: 0.014
 Size: 100 №: 2 Time: 0.024
 Size: 100 №: 3 Time: 0.021
 Size: 250 №: 1 Time: 0.211
