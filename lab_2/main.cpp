@@ -2,13 +2,11 @@
 #include <fstream>
 #include <vector>
 #include <string>
-#include <omp.h>
 using namespace std;
 
 void writeMatrixToFile(string filename, const vector<vector<int>> &matrix)
 {
-
-    ofstream file("files/matrix1_2/" + filename);
+    ofstream file("C:/PYTHON/laba_pp/matrix/matrix_1_2/" + filename);
 
     if (file.is_open())
     {
@@ -47,7 +45,7 @@ void createRandMatrix(string file_name, int size)
 void read_matrix(vector<vector<int>> &matrix, int size, string filename)
 {
     ifstream data;
-    data.open("files/matrix1_2/" + filename);
+    data.open("C:/PYTHON/laba_pp/matrix/matrix_1_2/" + filename);
 
     if (data.is_open())
     {
@@ -62,33 +60,31 @@ void read_matrix(vector<vector<int>> &matrix, int size, string filename)
     data.close();
 }
 
-void mulMatrix(const vector<vector<int>> &matrix_1, const vector<vector<int>> &matrix_2, vector<vector<int>> &matrix_result)
+void mulMatrix(const vector<vector<int>> &matrix_1, const vector<vector<int>> &matrix_2, vector<vector<int>> &matrix_3)
 {
-    int i, j, k;
-#pragma omp parallel for shared(matrix_1, matrix_2, matrix_result) private(i, j, k)
-    for (i = 0; i < matrix_result.size(); i++)
+    for (int i = 0; i < matrix_3.size(); i++)
     {
-        for (j = 0; j < matrix_result[i].size(); j++)
+        for (int j = 0; j < matrix_3[i].size(); j++)
         {
-            matrix_result[i][j] = 0;
-            for (k = 0; k < matrix_2.size(); k++)
+            matrix_3[i][j] = 0;
+            for (int k = 0; k < matrix_2.size(); k++)
             {
-                matrix_result[i][j] += matrix_1[i][k] * matrix_2[k][j];
+                matrix_3[i][j] += matrix_1[i][k] * matrix_2[k][j];
             }
         }
     }
 }
 
-void writeStat(string str, vector<vector<int>> &matrix_result, int size, clock_t end, clock_t start, int i)
+void writeResult(string str, vector<vector<int>> &matrix_3, int size, clock_t end, clock_t start, int i)
 {
     ofstream data(str);
-    ofstream result("files/result.txt", ios::app);
+    ofstream result("C:/PYTHON/laba_pp/file/result.txt", ios::app);
 
-    for (int i = 0; i < matrix_result.size(); i++)
+    for (int i = 0; i < matrix_3.size(); i++)
     {
-        for (int j = 0; j < matrix_result[i].size(); j++)
+        for (int j = 0; j < matrix_3[i].size(); j++)
         {
-            data << " " << matrix_result[i][j];
+            data << " " << matrix_3[i][j];
         }
         data << endl;
     }
@@ -99,35 +95,38 @@ void writeStat(string str, vector<vector<int>> &matrix_result, int size, clock_t
     result.close();
 }
 
+std::vector<std::vector<int>> createMatrix(int size)
+{
+    return std::vector<std::vector<int>>(size, std::vector<int>(size));
+}
+
 int main()
 {
-    std::ofstream file("files/result.txt", std::ios::out | std::ios::trunc);
-    std::initializer_list<int> SIZE = {100, 250, 500, 750, 1000, 1500, 2000, 3000};
+    std::vector<int> sizes = {500, 2000, 4500, 8000, 12500, 18000, 24500};
 
-    for (int size : SIZE)
+    for (int size : sizes)
         for (int i = 1; i < 4; i++)
         {
+            std::vector<std::vector<int>> matrix_1 = createMatrix(size);
+            std::vector<std::vector<int>> matrix_2 = createMatrix(size);
+            std::vector<std::vector<int>> matrix_3 = createMatrix(size);
+
+            createRandMatrix("m_1_" + std::to_string(size) + "_" + std::to_string(i) + ".txt", size);
+            createRandMatrix("m_2_" + std::to_string(size) + "_" + std::to_string(i) + ".txt", size);
+
+            read_matrix(matrix_1, size, "m_1_" + std::to_string(size) + "_" + std::to_string(i) + ".txt");
+            read_matrix(matrix_2, size, "m_2_" + std::to_string(size) + "_" + std::to_string(i) + ".txt");
+
+            clock_t start, end;
+
+            if (!matrix_1.empty() && !matrix_2.empty())
             {
-                std::vector<std::vector<int>> matrix_1(size, std::vector<int>(size));
-                std::vector<std::vector<int>> matrix_2(size, std::vector<int>(size));
-                std::vector<std::vector<int>> matrix_res(size, std::vector<int>(size));
-
-                createRandMatrix("matrix1_" + std::to_string(size) + "_" + std::to_string(i) + ".txt", size);
-                createRandMatrix("matrix2_" + std::to_string(size) + "_" + std::to_string(i) + ".txt", size);
-
-                read_matrix(matrix_1, size, "matrix1_" + std::to_string(size) + ".txt");
-                read_matrix(matrix_2, size, "matrix2_" + std::to_string(size) + ".txt");
-
-                clock_t start, end;
-                if (!matrix_1.empty() && !matrix_2.empty())
-                {
-                    start = clock();
-                    mulMatrix(matrix_1, matrix_2, matrix_res);
-                    end = clock();
-                }
-
-                writeStat("files/matrix_res/matrix_res_" + std::to_string(size) + "_" + std::to_string(i) + ".txt", matrix_res, size, end, start, i);
+                start = clock();
+                mulMatrix(matrix_1, matrix_2, matrix_3);
+                end = clock();
             }
+
+            writeResult("C:/PYTHON/laba_pp/matrix/matrix_3/m_" + std::to_string(size) + "_" + std::to_string(i + 1) + ".txt", matrix_3, size, end, start, i);
         }
     return 0;
 }
